@@ -6,24 +6,25 @@ function Contact() {
   const [contactData, setContactData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({});
+  const [warning, setWarning] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
 
-  // For form submission
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    place: "",
-    email: "",
-    message: "",
-  });
-
-  // Fetch contact page content from backend
   useEffect(() => {
     const fetchContactData = async () => {
       try {
         const response = await fetch("http://localhost:5000/api/contact");
         if (!response.ok) throw new Error("Failed to fetch contact data");
         const data = await response.json();
-        setContactData(data);
+        
+        const pageData = Array.isArray(data) ? data[0] : data;
+        setContactData(pageData);
+        
+        const initialFormData = {};
+        pageData.formSection.fields.forEach(field => {
+          initialFormData[field.name] = '';
+        });
+        setFormData(initialFormData);
       } catch (err) {
         setError(err.message);
         console.error("Error fetching contact data:", err);
@@ -31,41 +32,97 @@ function Contact() {
         setLoading(false);
       }
     };
-
     fetchContactData();
   }, []);
 
-  // Handle form input change
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setWarning("");
   };
 
-  // Handle form submit (optional - posts form to your API)
-  const handleSubmit = async (e) => {
+  const validationCheck = (e) => {
     e.preventDefault();
-    try {
-      const response = await fetch("http://localhost:5000/api/contact/form", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        alert("Message sent successfully!");
-        setFormData({ name: "", phone: "", place: "", email: "", message: "" });
-      } else {
-        alert("Failed to send message.");
+    
+    // Check required fields
+    const requiredFields = contactData.formSection.fields.filter(f => f.required);
+    for (let field of requiredFields) {
+      if (!formData[field.name] || formData[field.name].trim() === '') {
+        setWarning(`Please fill in the ${field.label} field.`);
+        return;
       }
-    } catch (err) {
-      console.error("Error submitting message:", err);
     }
+
+    // Email validation
+    const emailField = contactData.formSection.fields.find(f => f.type === 'email');
+    if (emailField && formData[emailField.name]) {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(formData[emailField.name])) {
+        setWarning('Please enter a valid email address.');
+        return;
+      }
+    }
+
+    // If validation passes, show popup
+    setWarning('');
+    setShowPopup(true);
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
-  if (!contactData) return <p>No data available</p>;
+  const closePopup = () => {
+    setShowPopup(false);
+  };
 
-  const { title, formSection, footer } = contactData;
+  const confirmSubmit = () => {
+    // Reset form after confirmation
+    const resetData = {};
+    contactData.formSection.fields.forEach(field => {
+      resetData[field.name] = '';
+    });
+    setFormData(resetData);
+    setShowPopup(false);
+    setWarning('Message submitted successfully!');
+    
+    setTimeout(() => {
+      setWarning('');
+    }, 3000);
+  };
+
+  const clearMsg = (e) => {
+    e.preventDefault();
+    const resetData = {};
+    contactData.formSection.fields.forEach(field => {
+      resetData[field.name] = '';
+    });
+    setFormData(resetData);
+    setWarning('');
+  };
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '50px' }}>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '50px', color: 'red' }}>
+        <p>Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (!contactData) {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '50px' }}>
+        <p>No data available</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -78,30 +135,42 @@ function Contact() {
         </ul>
       </div>
 
-      {/* Contact Section */}
+      {/* Contact Form Section */}
       <section className="form-container">
-        <h1 style={{ textAlign: "center", marginTop: "40px" }}>{title}</h1>
-        <p style={{ textAlign: "center" }}>{formSection.subtitle}</p>
+        <h1 style={{ textAlign: "center", marginTop: "40px" }}>
+          {contactData.title}
+        </h1>
+        <p style={{ textAlign: "center" }}>
+          {contactData.subtitle}
+        </p>
 
-        <form onSubmit={handleSubmit} className="contact-form">
-          {formSection.fields.map((field, index) => (
-            <div key={index}>
-              <label htmlFor={field.name}>{field.label}</label>
-              {field.type === "textarea" ? (
+        <form 
+          id="contactForm"
+          className="contact-form" 
+          onSubmit={validationCheck}
+        >
+          {contactData.formSection.fields.map((field, index) => (
+            <div key={field._id || index}>
+              <label htmlFor={field.name}>
+                {field.label}
+                {field.required && <span style={{ color: 'red' }}> *</span>}
+              </label>
+              
+              {field.type === 'textarea' ? (
                 <textarea
                   id={field.name}
                   name={field.name}
                   rows="5"
-                  value={formData[field.name]}
+                  value={formData[field.name] || ''}
                   onChange={handleChange}
                   required={field.required}
-                ></textarea>
+                />
               ) : (
                 <input
-                  id={field.name}
                   type={field.type}
+                  id={field.name}
                   name={field.name}
-                  value={formData[field.name]}
+                  value={formData[field.name] || ''}
                   onChange={handleChange}
                   required={field.required}
                 />
@@ -109,51 +178,98 @@ function Contact() {
             </div>
           ))}
 
-          <div style={{ marginTop: "10px" }}>
-            {formSection.buttons.map((button, index) => (
+          <div className="button-group">
+            {contactData.formSection.buttons.map((btn, index) => (
               <button
-                key={index}
-                id={button.id}
-                type={button.type}
-                onClick={button.type === "reset" ? () => setFormData({
-                  name: "",
-                  phone: "",
-                  place: "",
-                  email: "",
-                  message: "",
-                }) : undefined}
+                key={btn._id || index}
+                id={btn.id}
+                type={btn.type === 'reset' ? 'button' : btn.type}
+                onClick={btn.type === 'reset' ? clearMsg : undefined}
               >
-                {button.label}
+                {btn.label}
               </button>
             ))}
           </div>
         </form>
+
+        <p 
+          id="warning" 
+          style={{ 
+            color: warning.includes('success') ? 'green' : 'red',
+            textAlign: 'center',
+            fontWeight: 'bold',
+            marginTop: '10px'
+          }}
+        >
+          {warning || <br />}
+        </p>
       </section>
+
+      {/* Popup Modal */}
+      {showPopup && (
+        <div className="popup-overlay" onClick={closePopup}>
+          <div className="popup-content" onClick={(e) => e.stopPropagation()}>
+            <div className="popup-header">
+              <h2>📧 Form Submission Details</h2>
+              <button className="close-btn" onClick={closePopup}>&times;</button>
+            </div>
+            <div className="popup-body">
+              {contactData.formSection.fields.map((field, index) => (
+                <div key={index} className="popup-field">
+                  <strong>{field.label}:</strong>
+                  <p>{formData[field.name] || 'Not provided'}</p>
+                </div>
+              ))}
+            </div>
+            <div className="popup-footer">
+              <button className="btn-confirm" onClick={confirmSubmit}>
+                ✓ Confirm & Submit
+              </button>
+              <button className="btn-cancel" onClick={closePopup}>
+                ✗ Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="footer">
         <div className="footer-container">
           <p className="footer-title">
-            © {footer.year} {footer.developerName} | Designed & Developed by Me
+            {contactData.footer.copyright}
           </p>
           <div className="footer-links">
             <div className="quick-links">
               <h4>Quick Links</h4>
-              {footer.quickLinks.map((link, index) => (
-                <Link key={index} to={`/${link.toLowerCase()}`}>{link}</Link>
+              {contactData.footer.quickLinks.map((link, index) => (
+                <Link key={link._id || index} to={`/${link.url.replace('.html', '')}`}>
+                  {link.name}
+                </Link>
               ))}
             </div>
             <div className="social-links">
               <h4>Connect</h4>
-              <a href={footer.socialLinks.github} target="_blank" rel="noopener noreferrer">GitHub</a>
-              <a href={footer.socialLinks.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
-              <a href={footer.socialLinks.instagram} target="_blank" rel="noopener noreferrer">Instagram</a>
+              {contactData.footer.socialLinks.map((link, index) => (
+                <a 
+                  key={link._id || index}
+                  href={link.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  {link.platform}
+                </a>
+              ))}
             </div>
             <div className="contact-details">
               <h4>Contact</h4>
-              <p>Email: <a href={`mailto:${footer.contact.email}`}>{footer.contact.email}</a></p>
-              <p>Phone: {footer.contact.phone}</p>
-              <p>{footer.contact.location}</p>
+              <p>
+                Email: <a href={`mailto:${contactData.footer.contactDetails.email}`}>
+                  {contactData.footer.contactDetails.email}
+                </a>
+              </p>
+              <p>Phone: {contactData.footer.contactDetails.phone}</p>
+              <p>{contactData.footer.contactDetails.location}</p>
             </div>
           </div>
         </div>
