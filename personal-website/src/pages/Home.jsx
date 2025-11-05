@@ -20,12 +20,12 @@ function Home() {
         if (!response.ok) throw new Error("Failed to fetch home data");
         const data = await response.json();
 
-        console.log("✅ Home Data fetched:", data);
+        console.log("Home Data fetched:", data);
 
         // Since your API returns an OBJECT (not array)
         setHomeData(data);
       } catch (err) {
-        console.error("❌ Error fetching home data:", err);
+        console.error("Error fetching home data:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -40,6 +40,13 @@ function Home() {
   if (!homeData) return <p>No data available</p>;
 
   const { heroSection, whatIDoSection, experiencesSection, footer } = homeData;
+
+  const imageMap = {
+  "images/job_portal.png": jobPortal,
+  "images/portfolio_wordpress.png": portfolioWordpress,
+  "images/solar_secure_solutions.png": solarSecure,
+  "images/android_experience.png": androidExp
+};
 
   return (
     <>
@@ -95,22 +102,7 @@ function Home() {
         <div className="project-grid">
           {experiencesSection.projects.map((project, index) => (
             <a key={index} href={project.link} target="_blank" rel="noopener noreferrer">
-              <img src={project.image} alt={project.alt} />
-            </a>
-          ))}
-        </div>
-      </section>
-
-      {/* Experiences Section */}
-      <section className="projects">
-        <h2>{experiencesSection.title}</h2>
-        <div className="project-grid">
-          {experiencesSection.projects.map((project, index) => (
-            <a key={index} href={project.link} target="_blank" rel="noopener noreferrer">
-              <img 
-                src={require(`../../assets/images/${project.image}`)} 
-                alt={project.alt} 
-              />
+              <img src={imageMap[project.image]} alt={project.alt} />
             </a>
           ))}
         </div>
