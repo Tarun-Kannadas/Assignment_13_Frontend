@@ -337,9 +337,19 @@ form.contact-form button:hover {
     color: #7dfc7d;
 }
 
+#submitbtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(34, 255, 0, 0.792);
+}
+
 #clearbtn
 {
     color: red;
+}
+
+#clearbtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 0, 0, 0.873);
 }
 
 #warning
@@ -349,7 +359,19 @@ form.contact-form button:hover {
     color: red;
 }
 
-/* Popup Modal Styles */
+.button-group button {
+  margin-right: 15px;
+  padding: 12px 24px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+}
+
+.button-group button:last-child {
+  margin-right: 0;
+}
+
 .popup-overlay {
   position: fixed;
   top: 0;
@@ -499,7 +521,6 @@ form.contact-form button:hover {
   transform: translateY(-2px);
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .popup-content {
     width: 95%;

@@ -210,7 +210,7 @@ function Contact() {
         <div className="popup-overlay" onClick={closePopup}>
           <div className="popup-content" onClick={(e) => e.stopPropagation()}>
             <div className="popup-header">
-              <h2>📧 Form Submission Details</h2>
+              <h2>Form Submission Details</h2>
               <button className="close-btn" onClick={closePopup}>&times;</button>
             </div>
             <div className="popup-body">
@@ -223,10 +223,10 @@ function Contact() {
             </div>
             <div className="popup-footer">
               <button className="btn-confirm" onClick={confirmSubmit}>
-                ✓ Confirm & Submit
+                Confirm & Submit
               </button>
               <button className="btn-cancel" onClick={closePopup}>
-                ✗ Cancel
+                Cancel
               </button>
             </div>
           </div>

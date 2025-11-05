@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import "../assets/styles/styles.css";
 import leftImage from "../assets/images/left_image.png";
 import rightImage from "../assets/images/givespin.png";
-import wordpressImage from "../assets/images/portfolio_wordpress.png";
-import solarsecureImage from "../assets/images/solar_secure_solutions.png";
-import tarunImage from "../assets/images/tarun.jpg";
-import jobportalImage from "../assets/images/job_portal.png";
+import jobPortal from '../assets/images/job_portal.png';
+import portfolioWordpress from '../assets/images/portfolio_wordpress.png';
+import solarSecure from '../assets/images/solar_secure_solutions.png';
+import androidExp from '../assets/images/android_experience.png';
 
 function Home() {
   const [homeData, setHomeData] = useState(null);
@@ -96,6 +96,21 @@ function Home() {
           {experiencesSection.projects.map((project, index) => (
             <a key={index} href={project.link} target="_blank" rel="noopener noreferrer">
               <img src={project.image} alt={project.alt} />
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* Experiences Section */}
+      <section className="projects">
+        <h2>{experiencesSection.title}</h2>
+        <div className="project-grid">
+          {experiencesSection.projects.map((project, index) => (
+            <a key={index} href={project.link} target="_blank" rel="noopener noreferrer">
+              <img 
+                src={require(`../../assets/images/${project.image}`)} 
+                alt={project.alt} 
+              />
             </a>
           ))}
         </div>
