@@ -15,19 +15,23 @@ function Home() {
 
   useEffect(() => {
     const fetchHomeData = async () => {
-      try {
+      try 
+      {
         const response = await fetch("http://localhost:5000/api/home");
         if (!response.ok) throw new Error("Failed to fetch home data");
         const data = await response.json();
 
         console.log("Home Data fetched:", data);
 
-        // Since your API returns an OBJECT (not array)
         setHomeData(data);
-      } catch (err) {
+      } 
+      catch (err) 
+      {
         console.error("Error fetching home data:", err);
         setError(err.message);
-      } finally {
+      } 
+      finally 
+      {
         setLoading(false);
       }
     };
@@ -50,7 +54,6 @@ function Home() {
 
   return (
     <>
-      {/* Navbar */}
       <div className="navbar">
         <ul>
           <li><Link to="/">Home</Link></li>
@@ -59,7 +62,6 @@ function Home() {
         </ul>
       </div>
 
-      {/* Hero Section */}
       <div className="hero_section">
         <h1 className="h1_hero">{heroSection.heading}</h1>
         <p className="p_hero">{heroSection.description}</p>
@@ -68,12 +70,10 @@ function Home() {
         </a>
       </div>
 
-      {/* What I Do Section */}
       <section className="section-block">
         <h2>{whatIDoSection.title}</h2>
         <div className="whatido-wrapper">
 
-          {/* Left block */}
           <div className="image-block">
             <a href={whatIDoSection.leftBlock.link} className="linkwork" target="_blank" rel="noopener noreferrer">
               <img src={leftImage} alt={whatIDoSection.leftBlock.heading} />
@@ -81,12 +81,10 @@ function Home() {
             </a>
           </div>
 
-          {/* Middle text */}
           <div className="whatido-text">
             <p>{whatIDoSection.middleText}</p>
           </div>
 
-          {/* Right block */}
           <div className="image-block">
             <a href={whatIDoSection.rightBlock.link} className="linkwork" target="_blank" rel="noopener noreferrer">
               <img src={rightImage} alt={whatIDoSection.rightBlock.heading} />
@@ -96,7 +94,6 @@ function Home() {
         </div>
       </section>
 
-      {/* Experiences Section */}
       <section className="projects">
         <h2>{experiencesSection.title}</h2>
         <div className="project-grid">
@@ -108,7 +105,6 @@ function Home() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="footer">
         <div className="footer-container">
           <p className="footer-title">

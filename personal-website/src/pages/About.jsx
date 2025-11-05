@@ -9,15 +9,20 @@ function About() {
 
   useEffect(() => {
     const fetchAboutData = async () => {
-      try {
+      try 
+      {
         const response = await fetch('http://localhost:5000/api/about');
         if (!response.ok) throw new Error('Failed to fetch about data');
         const data = await response.json();
         setAboutData(data);
-      } catch (err) {
+      } 
+      catch (err) 
+      {
         setError(err.message);
         console.error('Error fetching about data:', err);
-      } finally {
+      } 
+      finally 
+      {
         setLoading(false);
       }
     };
@@ -25,7 +30,6 @@ function About() {
     fetchAboutData();
   }, []);
 
-  // Loading state
   if (loading) {
     return (
       <div className="loading-container">
@@ -34,7 +38,6 @@ function About() {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="error-container">
@@ -43,7 +46,6 @@ function About() {
     );
   }
 
-  // No data state
   if (!aboutData) {
     return (
       <div className="error-container">
@@ -54,7 +56,6 @@ function About() {
 
   return (
     <>
-      {/* Navbar */}
       <div className="navbar">
         <ul>
           <li><Link to="/">Home</Link></li>
@@ -63,7 +64,6 @@ function About() {
         </ul>
       </div>
 
-      {/* Body Content */}
       <section className="about_me">
         <h2>{aboutData.aboutMe.heading}</h2>
         <p>{aboutData.aboutMe.content}</p>
@@ -79,7 +79,6 @@ function About() {
         <p>{aboutData.goalsSection.goalDescription}</p>
       </section>
 
-      {/* Footer */}
       <footer className="footer">
         <div className="footer-container">
           <p className="footer-title">

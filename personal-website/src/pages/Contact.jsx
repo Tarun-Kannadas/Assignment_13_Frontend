@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../assets/styles/styles.css";
 
-function Contact() {
+function Contact() 
+{
   const [contactData, setContactData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,7 +13,8 @@ function Contact() {
 
   useEffect(() => {
     const fetchContactData = async () => {
-      try {
+      try 
+      {
         const response = await fetch("http://localhost:5000/api/contact");
         if (!response.ok) throw new Error("Failed to fetch contact data");
         const data = await response.json();
@@ -25,10 +27,14 @@ function Contact() {
           initialFormData[field.name] = '';
         });
         setFormData(initialFormData);
-      } catch (err) {
+      } 
+      catch (err) 
+      {
         setError(err.message);
         console.error("Error fetching contact data:", err);
-      } finally {
+      } 
+      finally 
+      {
         setLoading(false);
       }
     };
@@ -47,7 +53,6 @@ function Contact() {
   const validationCheck = (e) => {
     e.preventDefault();
     
-    // Check required fields
     const requiredFields = contactData.formSection.fields.filter(f => f.required);
     for (let field of requiredFields) {
       if (!formData[field.name] || formData[field.name].trim() === '') {
@@ -56,7 +61,6 @@ function Contact() {
       }
     }
 
-    // Email validation
     const emailField = contactData.formSection.fields.find(f => f.type === 'email');
     if (emailField && formData[emailField.name]) {
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -66,7 +70,6 @@ function Contact() {
       }
     }
 
-    // If validation passes, show popup
     setWarning('');
     setShowPopup(true);
   };
@@ -76,7 +79,7 @@ function Contact() {
   };
 
   const confirmSubmit = () => {
-    // Reset form after confirmation
+
     const resetData = {};
     contactData.formSection.fields.forEach(field => {
       resetData[field.name] = '';
@@ -126,7 +129,6 @@ function Contact() {
 
   return (
     <>
-      {/* Navbar */}
       <div className="navbar">
         <ul>
           <li><Link to="/">Home</Link></li>
@@ -135,7 +137,6 @@ function Contact() {
         </ul>
       </div>
 
-      {/* Contact Form Section */}
       <section className="form-container">
         <h1 style={{ textAlign: "center", marginTop: "40px" }}>
           {contactData.title}
@@ -205,7 +206,6 @@ function Contact() {
         </p>
       </section>
 
-      {/* Popup Modal */}
       {showPopup && (
         <div className="popup-overlay" onClick={closePopup}>
           <div className="popup-content" onClick={(e) => e.stopPropagation()}>
@@ -233,7 +233,6 @@ function Contact() {
         </div>
       )}
 
-      {/* Footer */}
       <footer className="footer">
         <div className="footer-container">
           <p className="footer-title">
